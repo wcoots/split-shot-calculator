@@ -1,25 +1,25 @@
-import { ShotSpecifications, ShotDictionary } from './types';
+import type { ShotSpecifications, ShotDictionary } from './types';
 
-const shotDictionary: ShotDictionary = {
-    '3SSG': { name: '3SSG', weightGrams: 4.8 },
-    '2SSG': { name: '2SSG', weightGrams: 3.2 },
-    LG: { name: 'LG', weightGrams: 3 },
-    LSG: { name: 'LSG', weightGrams: 2 },
-    SSG: { name: 'SSG', weightGrams: 1.6 },
-    AAA: { name: 'AAA', weightGrams: 0.8 },
-    AB: { name: 'AB', weightGrams: 0.6 },
-    BB: { name: 'BB', weightGrams: 0.4 },
-    1: { name: 'no1', weightGrams: 0.3 },
-    3: { name: 'no3', weightGrams: 0.25 },
-    4: { name: 'no4', weightGrams: 0.2 },
-    5: { name: 'no5', weightGrams: 0.15 },
-    6: { name: 'no6', weightGrams: 0.1 },
-    8: { name: 'no8', weightGrams: 0.06 },
-    9: { name: 'no9', weightGrams: 0.05 },
-    10: { name: 'no10', weightGrams: 0.04 },
-    11: { name: 'no11', weightGrams: 0.03 },
-    12: { name: 'no12', weightGrams: 0.02 },
-    13: { name: 'no13', weightGrams: 0.01 }
+export const shotDictionary: ShotDictionary = {
+    '3SSG': { name: '3SSG', weightGrams: 4.8, defaultSelected: false },
+    '2SSG': { name: '2SSG', weightGrams: 3.2, defaultSelected: false },
+    LG: { name: 'LG', weightGrams: 3, defaultSelected: false },
+    LSG: { name: 'LSG', weightGrams: 2, defaultSelected: false },
+    SSG: { name: 'SSG', weightGrams: 1.6, defaultSelected: true },
+    AAA: { name: 'AAA', weightGrams: 0.8, defaultSelected: true },
+    AB: { name: 'AB', weightGrams: 0.6, defaultSelected: false },
+    BB: { name: 'BB', weightGrams: 0.4, defaultSelected: true },
+    1: { name: 'no1', weightGrams: 0.3, defaultSelected: true },
+    3: { name: 'no3', weightGrams: 0.25, defaultSelected: true },
+    4: { name: 'no4', weightGrams: 0.2, defaultSelected: true },
+    5: { name: 'no5', weightGrams: 0.15, defaultSelected: false },
+    6: { name: 'no6', weightGrams: 0.1, defaultSelected: true },
+    8: { name: 'no8', weightGrams: 0.06, defaultSelected: true },
+    9: { name: 'no9', weightGrams: 0.05, defaultSelected: false },
+    10: { name: 'no10', weightGrams: 0.04, defaultSelected: false },
+    11: { name: 'no11', weightGrams: 0.03, defaultSelected: false },
+    12: { name: 'no12', weightGrams: 0.02, defaultSelected: false },
+    13: { name: 'no13', weightGrams: 0.01, defaultSelected: false }
 };
 
 function calculateTotalShotWeight(shotPattern: ShotSpecifications[]) {
@@ -44,6 +44,13 @@ export function calculateShotPatterns({
         }, [])
         .sort((shotA, shotB) => shotA.weightGrams - shotB.weightGrams);
 
+    const predictedCombinationCount = calculateCombinationsCount(
+        availableShot.length,
+        desiredShotCount
+    );
+
+    console.log('calculating', predictedCombinationCount, 'combinations...');
+
     if (!availableShot.length) {
         throw new Error('No available shot.');
     } else if (desiredShotCount <= 0) {
@@ -55,7 +62,7 @@ export function calculateShotPatterns({
     }
 
     const shotPatterns: {
-        shotPattern: ShotSpecifications[];
+        shotPattern: string[];
         totalWeightGrams: number;
         offsetWeightGrams: number;
         variation: number;
@@ -67,7 +74,7 @@ export function calculateShotPatterns({
             const offsetWeightGrams = Math.abs(desiredWeightGrams - totalWeightGrams);
             const variation = Array.from(new Set(currentCombination.map((c) => c.name))).length;
             shotPatterns.push({
-                shotPattern: [...currentCombination],
+                shotPattern: currentCombination.map((shot) => shot.name),
                 totalWeightGrams,
                 offsetWeightGrams,
                 variation
@@ -92,4 +99,18 @@ export function calculateShotPatterns({
             );
         })
         .slice(0, 10);
+}
+
+function calculateCombinationsCount(
+    availableShotSizeCount: number,
+    desiredShotCount: number
+): number {
+    function factorial(num: number): number {
+        if (num === 0) return 1;
+        return num * factorial(num - 1);
+    }
+
+    const numerator = factorial(availableShotSizeCount + desiredShotCount - 1);
+    const denominator = factorial(desiredShotCount) * factorial(availableShotSizeCount - 1);
+    return numerator / denominator;
 }
