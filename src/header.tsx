@@ -1,6 +1,6 @@
 import './index.css';
 
-export function Header() {
+function Header() {
     return (
         <div className="header">
             <b>Split-shot calculator</b>
@@ -13,3 +13,5 @@ export function Header() {
         </div>
     );
 }
+
+export default Header;

@@ -1,4 +1,4 @@
-import type { ShotSpecifications, ShotDictionary } from './types';
+import type { ShotSpecifications, ShotDictionary, ShotPattern } from './types';
 
 export const shotDictionary: ShotDictionary = {
     '3SSG': { name: '3SSG', weightGrams: 4.8, defaultSelected: false },
@@ -23,7 +23,9 @@ export const shotDictionary: ShotDictionary = {
 };
 
 function calculateTotalShotWeight(shotPattern: ShotSpecifications[]) {
-    return shotPattern.reduce((totalWeight, shot) => (totalWeight += shot.weightGrams), 0);
+    return +shotPattern
+        .reduce((totalWeight, shot) => (totalWeight += shot.weightGrams), 0)
+        .toFixed(2);
 }
 
 export function calculateShotPatterns({
@@ -61,17 +63,12 @@ export function calculateShotPatterns({
         throw new Error('Total shot weight must be greater than zero.');
     }
 
-    const shotPatterns: {
-        shotPattern: string[];
-        totalWeightGrams: number;
-        offsetWeightGrams: number;
-        variation: number;
-    }[] = [];
+    const shotPatterns: ShotPattern[] = [];
 
     function generateCombinations(currentCombination: ShotSpecifications[], startingIndex: number) {
         if (currentCombination.length === desiredShotCount) {
             const totalWeightGrams = calculateTotalShotWeight(currentCombination);
-            const offsetWeightGrams = Math.abs(desiredWeightGrams - totalWeightGrams);
+            const offsetWeightGrams = +(totalWeightGrams - desiredWeightGrams).toFixed(2);
             const variation = Array.from(new Set(currentCombination.map((c) => c.name))).length;
             shotPatterns.push({
                 shotPattern: currentCombination.map((shot) => shot.name),
@@ -94,7 +91,8 @@ export function calculateShotPatterns({
     return shotPatterns
         .sort((shotPatternA, shotPatternB) => {
             return (
-                shotPatternA.offsetWeightGrams - shotPatternB.offsetWeightGrams ||
+                Math.abs(shotPatternA.offsetWeightGrams) -
+                    Math.abs(shotPatternB.offsetWeightGrams) ||
                 shotPatternB.variation - shotPatternA.variation
             );
         })

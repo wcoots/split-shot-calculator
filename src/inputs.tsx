@@ -1,8 +1,9 @@
 import { useState, ChangeEvent } from 'react';
 import './index.css';
 import { shotDictionary, calculateShotPatterns } from './shot';
+import type { ShotPattern } from './types';
 
-export function Inputs() {
+function Inputs({ returnShotPatterns }: { returnShotPatterns: (response: ShotPattern[]) => void }) {
     // DESIRED SHOT COUNT
     const [desiredShotCount, setDesiredShotCount] = useState('4');
 
@@ -67,12 +68,7 @@ export function Inputs() {
         return radioRows;
     }
 
-    // SUBMIT
-    const [response, setResponse] = useState('');
-
     function handleSubmit() {
-        setResponse('');
-
         const availableShotSizes = Object.entries(shotSelection)
             .filter(([, shot]) => shot.defaultSelected)
             .map(([name]) => name);
@@ -83,9 +79,7 @@ export function Inputs() {
             desiredWeightGrams: +desiredWeightGrams
         });
 
-        console.log('done!');
-
-        setResponse(JSON.stringify(functionResponse));
+        returnShotPatterns(functionResponse);
     }
 
     return (
@@ -122,3 +116,5 @@ export function Inputs() {
         </div>
     );
 }
+
+export default Inputs;
