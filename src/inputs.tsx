@@ -1,6 +1,6 @@
 import { useState, ChangeEvent } from 'react';
 import './index.css';
-import { shotDictionary, calculateShotPatterns } from './shot';
+import { shotDictionary, calculateCombinationCount, calculateShotPatterns } from './shot';
 import type { ShotPattern } from './types';
 
 function Inputs({
@@ -73,7 +73,7 @@ function Inputs({
     }
 
     // HANDLE SUBMIT
-
+    const [predictedCombinationCount, setPredictedCombinationCount] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -83,9 +83,12 @@ function Inputs({
             .map(([name]) => name);
 
         try {
+            returnShotPatterns(null);
+            setPredictedCombinationCount(
+                calculateCombinationCount(availableShotSizes.length, +desiredShotCount)
+            );
             setIsLoading(true);
             setErrorMessage(null);
-            returnShotPatterns(null);
 
             await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -95,9 +98,12 @@ function Inputs({
                 desiredWeightGrams: +desiredWeightGrams
             });
 
-            setIsLoading(false);
             returnShotPatterns(shotPatterns);
+            setIsLoading(false);
         } catch (error) {
+            returnShotPatterns(null);
+            setPredictedCombinationCount(null);
+            setIsLoading(false);
             setErrorMessage((error as Error).message);
         }
     }
@@ -105,7 +111,7 @@ function Inputs({
     return (
         <div className="flex-container">
             <div className="flex-item">
-                <label className="label-margin">Desired shot count:</label>
+                <label className="label-margin">Shot count:</label>
                 <input
                     inputMode="numeric"
                     value={desiredShotCount}
@@ -122,7 +128,7 @@ function Inputs({
                 />
             </div>
             <div className="flex-item">
-                <label className="label-margin">Desired total shot weight (g):</label>
+                <label className="label-margin">Shot weight (g):</label>
                 <input
                     inputMode="numeric"
                     value={desiredWeightGrams}
@@ -141,15 +147,27 @@ function Inputs({
             </div>
             <div className="flex-container">
                 <button
-                    className="submit-button"
+                    className="button"
                     onClick={() => setShotSelectionMenuVisible(!shotSelectionMenuVisible)}>
                     {shotSelectionMenuVisible ? 'Close tackle box' : 'Open tackle box'}
                 </button>
             </div>
             {shotSelectionMenuVisible && <div className="flex-wrap">{renderRadioInputs()}</div>}
             <div className="flex-item">
-                <button onClick={handleSubmit}>Generate shot patterns</button>
+                <button className="button" onClick={handleSubmit}>
+                    Generate shot patterns
+                </button>
                 {errorMessage ? <div className="error-text">{errorMessage}</div> : null}
+                {isLoading && predictedCombinationCount ? (
+                    <div className="combination-count-text">
+                        Calculating {predictedCombinationCount.toLocaleString()} combinations...
+                    </div>
+                ) : null}
+                {!isLoading && predictedCombinationCount ? (
+                    <div className="combination-count-text">
+                        Calculated {predictedCombinationCount.toLocaleString()} combinations.
+                    </div>
+                ) : null}
             </div>
 
             <div className="loader-container">{isLoading ? <div className="loader" /> : null}</div>

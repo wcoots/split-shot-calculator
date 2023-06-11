@@ -46,13 +46,6 @@ export function calculateShotPatterns({
         }, [])
         .sort((shotA, shotB) => shotA.weightGrams - shotB.weightGrams);
 
-    const predictedCombinationCount = calculateCombinationsCount(
-        availableShot.length,
-        desiredShotCount
-    );
-
-    console.log('calculating', predictedCombinationCount, 'combinations...');
-
     if (!availableShot.length) {
         throw new Error('No available shot.');
     } else if (desiredShotCount <= 0) {
@@ -99,10 +92,16 @@ export function calculateShotPatterns({
         .slice(0, 10);
 }
 
-function calculateCombinationsCount(
+export function calculateCombinationCount(
     availableShotSizeCount: number,
     desiredShotCount: number
 ): number {
+    if (availableShotSizeCount === 0) {
+        throw new Error('No available shot.');
+    } else if (desiredShotCount === 0) {
+        throw new Error('Shot count must be greater than zero.');
+    }
+
     function factorial(num: number): number {
         if (num === 0) return 1;
         return num * factorial(num - 1);
