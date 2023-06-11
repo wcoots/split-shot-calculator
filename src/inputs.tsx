@@ -1,6 +1,7 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import './index.css';
 import { shotDictionary, calculateCombinationCount, calculateShotPatterns } from './shot';
+import { detectMobile } from './utils';
 import type { ShotDictionary, ShotPattern } from './types';
 
 function Inputs({
@@ -8,6 +9,8 @@ function Inputs({
 }: {
     returnShotPatterns: (response: ShotPattern[] | null) => void;
 }) {
+    const isMobile = detectMobile();
+
     const savedSettingsString = localStorage.getItem('settings');
     const savedSettings = savedSettingsString
         ? (JSON.parse(savedSettingsString) as {
@@ -22,8 +25,8 @@ function Inputs({
         savedSettings?.desiredShotCount ?? '4'
     );
 
-    function handleDesiredShotCountChange(e: ChangeEvent<HTMLInputElement>) {
-        const value = e.target.value;
+    function handleDesiredShotCountChange(event: ChangeEvent<HTMLInputElement>) {
+        const value = event.target.value;
         if (value === '' || /^[1-9]$/.test(value)) {
             setDesiredShotCount(value);
         }
@@ -34,8 +37,8 @@ function Inputs({
         savedSettings?.desiredWeightGrams ?? '1.5'
     );
 
-    function handleDesiredWeightGramsChange(e: ChangeEvent<HTMLInputElement>) {
-        const value = e.target.value;
+    function handleDesiredWeightGramsChange(event: ChangeEvent<HTMLInputElement>) {
+        const value = event.target.value;
         if (value === '' || /^(9(\.\d{1,2})?|[0-8](\.\d{1,2})?|[0-9]\.)$/.test(value)) {
             setDesiredWeightGrams(value);
         }
@@ -135,7 +138,7 @@ function Inputs({
 
     return (
         <div className="flex-container">
-            <div className="flex-item">
+            <div className={isMobile ? 'flex-item-mobile' : 'flex-item'}>
                 <label className="label-margin">Shot count:</label>
                 <input
                     inputMode="numeric"
@@ -152,7 +155,7 @@ function Inputs({
                     max="9"
                 />
             </div>
-            <div className="flex-item">
+            <div className={isMobile ? 'flex-item-mobile' : 'flex-item'}>
                 <label className="label-margin">Shot weight (g):</label>
                 <input
                     inputMode="numeric"
@@ -172,14 +175,14 @@ function Inputs({
             </div>
             <div className="flex-container">
                 <button
-                    className="button"
+                    className={isMobile ? 'mobile-button' : 'button'}
                     onClick={() => setShotSelectionMenuVisible(!shotSelectionMenuVisible)}>
                     {shotSelectionMenuVisible ? 'Close tackle box' : 'Open tackle box'}
                 </button>
             </div>
             {shotSelectionMenuVisible && <div className="flex-wrap">{renderRadioInputs()}</div>}
-            <div className="flex-item">
-                <button className="button" onClick={handleSubmit}>
+            <div className={isMobile ? 'flex-item-mobile' : 'flex-item'}>
+                <button className={isMobile ? 'mobile-button' : 'button'} onClick={handleSubmit}>
                     Generate shot patterns
                 </button>
                 {errorMessage ? <div className="error-text">{errorMessage}</div> : null}
