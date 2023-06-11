@@ -39,6 +39,8 @@ code {
     display: flex;
     align-items: center;
     margin-right: 10px;
+    flex-grow: 1;
+    width: 100%;
 }
 
 .label-margin {
@@ -67,6 +69,7 @@ code {
 
 .slider {
     margin-left: 10px;
+    width: 100%;
 }
 
 .error-text {
