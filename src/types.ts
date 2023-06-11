@@ -1,7 +1,7 @@
 export interface ShotSpecifications {
     name: string;
     weightGrams: number;
-    defaultSelected: boolean;
+    selected: boolean;
 }
 
 export type ShotDictionary = { [size: string]: ShotSpecifications };

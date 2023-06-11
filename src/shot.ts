@@ -1,25 +1,25 @@
 import type { ShotSpecifications, ShotDictionary, ShotPattern } from './types';
 
 export const shotDictionary: ShotDictionary = {
-    '3SSG': { name: '3SSG', weightGrams: 4.8, defaultSelected: false },
-    '2SSG': { name: '2SSG', weightGrams: 3.2, defaultSelected: false },
-    LG: { name: 'LG', weightGrams: 3, defaultSelected: false },
-    LSG: { name: 'LSG', weightGrams: 2, defaultSelected: false },
-    SSG: { name: 'SSG', weightGrams: 1.6, defaultSelected: true },
-    AAA: { name: 'AAA', weightGrams: 0.8, defaultSelected: true },
-    AB: { name: 'AB', weightGrams: 0.6, defaultSelected: false },
-    BB: { name: 'BB', weightGrams: 0.4, defaultSelected: true },
-    1: { name: 'no1', weightGrams: 0.3, defaultSelected: true },
-    3: { name: 'no3', weightGrams: 0.25, defaultSelected: true },
-    4: { name: 'no4', weightGrams: 0.2, defaultSelected: true },
-    5: { name: 'no5', weightGrams: 0.15, defaultSelected: false },
-    6: { name: 'no6', weightGrams: 0.1, defaultSelected: true },
-    8: { name: 'no8', weightGrams: 0.06, defaultSelected: true },
-    9: { name: 'no9', weightGrams: 0.05, defaultSelected: false },
-    10: { name: 'no10', weightGrams: 0.04, defaultSelected: false },
-    11: { name: 'no11', weightGrams: 0.03, defaultSelected: false },
-    12: { name: 'no12', weightGrams: 0.02, defaultSelected: false },
-    13: { name: 'no13', weightGrams: 0.01, defaultSelected: false }
+    '3SSG': { name: '3SSG', weightGrams: 4.8, selected: false },
+    '2SSG': { name: '2SSG', weightGrams: 3.2, selected: false },
+    LG: { name: 'LG', weightGrams: 3, selected: false },
+    LSG: { name: 'LSG', weightGrams: 2, selected: false },
+    SSG: { name: 'SSG', weightGrams: 1.6, selected: true },
+    AAA: { name: 'AAA', weightGrams: 0.8, selected: true },
+    AB: { name: 'AB', weightGrams: 0.6, selected: false },
+    BB: { name: 'BB', weightGrams: 0.4, selected: true },
+    1: { name: 'no1', weightGrams: 0.3, selected: true },
+    3: { name: 'no3', weightGrams: 0.25, selected: true },
+    4: { name: 'no4', weightGrams: 0.2, selected: true },
+    5: { name: 'no5', weightGrams: 0.15, selected: false },
+    6: { name: 'no6', weightGrams: 0.1, selected: true },
+    8: { name: 'no8', weightGrams: 0.06, selected: true },
+    9: { name: 'no9', weightGrams: 0.05, selected: false },
+    10: { name: 'no10', weightGrams: 0.04, selected: false },
+    11: { name: 'no11', weightGrams: 0.03, selected: false },
+    12: { name: 'no12', weightGrams: 0.02, selected: false },
+    13: { name: 'no13', weightGrams: 0.01, selected: false }
 };
 
 function calculateTotalShotWeight(shotPattern: ShotSpecifications[]) {

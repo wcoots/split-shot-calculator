@@ -1,15 +1,26 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import './index.css';
 import { shotDictionary, calculateCombinationCount, calculateShotPatterns } from './shot';
-import type { ShotPattern } from './types';
+import type { ShotDictionary, ShotPattern } from './types';
 
 function Inputs({
     returnShotPatterns
 }: {
     returnShotPatterns: (response: ShotPattern[] | null) => void;
 }) {
+    const savedSettingsString = localStorage.getItem('settings');
+    const savedSettings = savedSettingsString
+        ? (JSON.parse(savedSettingsString) as {
+              desiredShotCount: string;
+              desiredWeightGrams: string;
+              shotSelection: ShotDictionary;
+          })
+        : null;
+
     // DESIRED SHOT COUNT
-    const [desiredShotCount, setDesiredShotCount] = useState('4');
+    const [desiredShotCount, setDesiredShotCount] = useState(
+        savedSettings?.desiredShotCount ?? '4'
+    );
 
     function handleDesiredShotCountChange(e: ChangeEvent<HTMLInputElement>) {
         const value = e.target.value;
@@ -19,7 +30,9 @@ function Inputs({
     }
 
     // DESIRED SHOT WEIGHT
-    const [desiredWeightGrams, setDesiredWeightGrams] = useState('1.5');
+    const [desiredWeightGrams, setDesiredWeightGrams] = useState(
+        savedSettings?.desiredWeightGrams ?? '1.5'
+    );
 
     function handleDesiredWeightGramsChange(e: ChangeEvent<HTMLInputElement>) {
         const value = e.target.value;
@@ -30,11 +43,13 @@ function Inputs({
 
     // SHOT SELECTION
     const [shotSelectionMenuVisible, setShotSelectionMenuVisible] = useState(false);
-    const [shotSelection, setShotSelection] = useState(shotDictionary);
+    const [shotSelection, setShotSelection] = useState(
+        savedSettings?.shotSelection ?? shotDictionary
+    );
 
     function onClickShotSelectionRadio(key: keyof typeof shotDictionary) {
         const clonedShotSelection = { ...shotSelection };
-        clonedShotSelection[key].defaultSelected = !clonedShotSelection[key].defaultSelected;
+        clonedShotSelection[key].selected = !clonedShotSelection[key].selected;
         setShotSelection(clonedShotSelection);
     }
 
@@ -60,7 +75,7 @@ function Inputs({
                             type="radio"
                             id={key}
                             name={`shot-${key}`}
-                            checked={value.defaultSelected}
+                            checked={value.selected}
                             onChange={() => null}
                             onClick={() => onClickShotSelectionRadio(key)}
                         />
@@ -72,6 +87,16 @@ function Inputs({
         return radioRows;
     }
 
+    // STORE SETTINGS
+    useEffect(
+        () =>
+            localStorage.setItem(
+                'settings',
+                JSON.stringify({ desiredShotCount, desiredWeightGrams, shotSelection })
+            ),
+        [desiredShotCount, desiredWeightGrams, shotSelection]
+    );
+
     // HANDLE SUBMIT
     const [predictedCombinationCount, setPredictedCombinationCount] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +104,7 @@ function Inputs({
 
     async function handleSubmit() {
         const availableShotSizes = Object.entries(shotSelection)
-            .filter(([, shot]) => shot.defaultSelected)
+            .filter(([, shot]) => shot.selected)
             .map(([name]) => name);
 
         try {
