@@ -4,10 +4,6 @@ import './index.css';
 import type { ShotPattern } from './types';
 
 function Patterns({ shotPatterns }: { shotPatterns: ShotPattern[] | null }) {
-    if (!shotPatterns) {
-        return <div />;
-    }
-
     const columns: Column<ShotPattern>[] = useMemo(
         () => [
             {
@@ -43,8 +39,12 @@ function Patterns({ shotPatterns }: { shotPatterns: ShotPattern[] | null }) {
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
         columns,
-        data: shotPatterns
+        data: shotPatterns ?? []
     });
+
+    if (!shotPatterns) {
+        return null;
+    }
 
     return (
         <table {...getTableProps()} style={{ width: '100%' }}>
