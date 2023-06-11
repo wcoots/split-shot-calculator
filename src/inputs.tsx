@@ -74,6 +74,7 @@ function Inputs({
 
     // HANDLE SUBMIT
 
+    const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     async function handleSubmit() {
@@ -82,6 +83,7 @@ function Inputs({
             .map(([name]) => name);
 
         try {
+            setIsLoading(true);
             setErrorMessage(null);
             returnShotPatterns(null);
 
@@ -93,6 +95,7 @@ function Inputs({
                 desiredWeightGrams: +desiredWeightGrams
             });
 
+            setIsLoading(false);
             returnShotPatterns(shotPatterns);
         } catch (error) {
             setErrorMessage((error as Error).message);
@@ -133,7 +136,7 @@ function Inputs({
                     onChange={handleDesiredWeightGramsChange}
                     min="0"
                     max="9.99"
-                    step="0.01"
+                    step="0.25"
                 />
             </div>
             <div className="flex-container">
@@ -148,6 +151,8 @@ function Inputs({
                 <button onClick={handleSubmit}>Generate shot patterns</button>
                 {errorMessage ? <div className="error-text">{errorMessage}</div> : null}
             </div>
+
+            <div className="loader-container">{isLoading ? <div className="loader" /> : null}</div>
         </div>
     );
 }
