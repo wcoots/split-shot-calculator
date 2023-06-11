@@ -3,7 +3,11 @@ import './index.css';
 import { shotDictionary, calculateShotPatterns } from './shot';
 import type { ShotPattern } from './types';
 
-function Inputs({ returnShotPatterns }: { returnShotPatterns: (response: ShotPattern[]) => void }) {
+function Inputs({
+    returnShotPatterns
+}: {
+    returnShotPatterns: (response: ShotPattern[] | null) => void;
+}) {
     // DESIRED SHOT COUNT
     const [desiredShotCount, setDesiredShotCount] = useState('4');
 
@@ -19,12 +23,12 @@ function Inputs({ returnShotPatterns }: { returnShotPatterns: (response: ShotPat
 
     function handleDesiredWeightGramsChange(e: ChangeEvent<HTMLInputElement>) {
         const value = e.target.value;
-        if (value === '' || /^\d*\.?\d+$/.test(value)) {
+        if (value === '' || /^(9(\.\d{1,2})?|[0-8](\.\d{1,2})?|[0-9]\.)$/.test(value)) {
             setDesiredWeightGrams(value);
         }
     }
 
-    // SHOT SELECYION
+    // SHOT SELECTION
     const [shotSelectionMenuVisible, setShotSelectionMenuVisible] = useState(false);
     const [shotSelection, setShotSelection] = useState(shotDictionary);
 
@@ -68,18 +72,31 @@ function Inputs({ returnShotPatterns }: { returnShotPatterns: (response: ShotPat
         return radioRows;
     }
 
-    function handleSubmit() {
+    // HANDLE SUBMIT
+
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    async function handleSubmit() {
         const availableShotSizes = Object.entries(shotSelection)
             .filter(([, shot]) => shot.defaultSelected)
             .map(([name]) => name);
 
-        const functionResponse = calculateShotPatterns({
-            availableShotSizes,
-            desiredShotCount: +desiredShotCount,
-            desiredWeightGrams: +desiredWeightGrams
-        });
+        try {
+            setErrorMessage(null);
+            returnShotPatterns(null);
 
-        returnShotPatterns(functionResponse);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            const shotPatterns = calculateShotPatterns({
+                availableShotSizes,
+                desiredShotCount: +desiredShotCount,
+                desiredWeightGrams: +desiredWeightGrams
+            });
+
+            returnShotPatterns(shotPatterns);
+        } catch (error) {
+            setErrorMessage((error as Error).message);
+        }
     }
 
     return (
@@ -92,6 +109,14 @@ function Inputs({ returnShotPatterns }: { returnShotPatterns: (response: ShotPat
                     onChange={handleDesiredShotCountChange}
                     className="input-numeric"
                 />
+                <input
+                    className="slider"
+                    type="range"
+                    value={desiredShotCount}
+                    onChange={handleDesiredShotCountChange}
+                    min="1"
+                    max="9"
+                />
             </div>
             <div className="flex-item">
                 <label className="label-margin">Desired total shot weight (g):</label>
@@ -101,17 +126,27 @@ function Inputs({ returnShotPatterns }: { returnShotPatterns: (response: ShotPat
                     onChange={handleDesiredWeightGramsChange}
                     className="input-numeric"
                 />
+                <input
+                    className="slider"
+                    type="range"
+                    value={desiredWeightGrams}
+                    onChange={handleDesiredWeightGramsChange}
+                    min="0"
+                    max="9.99"
+                    step="0.01"
+                />
             </div>
             <div className="flex-container">
                 <button
-                    className="button"
+                    className="submit-button"
                     onClick={() => setShotSelectionMenuVisible(!shotSelectionMenuVisible)}>
                     {shotSelectionMenuVisible ? 'Close tackle box' : 'Open tackle box'}
                 </button>
             </div>
             {shotSelectionMenuVisible && <div className="flex-wrap">{renderRadioInputs()}</div>}
-            <div className="generate-button-container">
+            <div className="flex-item">
                 <button onClick={handleSubmit}>Generate shot patterns</button>
+                {errorMessage ? <div className="error-text">{errorMessage}</div> : null}
             </div>
         </div>
     );

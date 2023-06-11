@@ -10,7 +10,7 @@ function App() {
     const [shotPatterns, setShotPatterns] = useState<ShotPattern[] | null>(null);
 
     // Function to handle the response and update the state
-    const handleResponse = (response: ShotPattern[]) => {
+    const handleResponse = (response: ShotPattern[] | null) => {
         setShotPatterns(response);
     };
 
